@@ -1,6 +1,7 @@
 # Technologies
 
 - Firebase
+- ContextAPI - For state management
 - React Native Appearance
 - Expo - Used Expo because I was developing on a Windows machine and testing on an iOS device therefore Expo Go came in Handy
 

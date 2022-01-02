@@ -102,8 +102,6 @@ export const AppNavigator = (): JSX.Element => {
     });
   }, [hasCheckedAnswer, isCorrectAnswer, selectedAnswer, currentQuestion]);
 
-  console.log({questions});
-
   if (loading) {
     return (
       <Container>
@@ -119,11 +117,11 @@ export const AppNavigator = (): JSX.Element => {
       <View style={styles.container}>
         <Header />
         <Question
-          text={questions[0].text}
-          translatedQuestionPreview={questions[0].translatedQuestionPreview}
+          text={questions[currentQuestion].text}
+          translatedQuestionPreview={questions[currentQuestion].translatedQuestionPreview}
         />
         <View style={styles.optionsContainer}>
-          {questions[0].options.map((option, index) => (
+          {questions[currentQuestion].options.map((option, index) => (
             <Option
               key={index}
               index={index}
