@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Alert, StyleSheet, View} from 'react-native';
+import {ActivityIndicator, Alert, StyleSheet, View} from 'react-native';
 import CheckAnswer from './components/button/CheckAnswer';
 import Container from './components/container/Container';
 import Header from './components/header/Header';
@@ -8,6 +8,7 @@ import Option from './components/option/Option';
 import {AppContext} from './context';
 import {firestore} from './lib/__firebase__';
 import {collection, onSnapshot} from 'firebase/firestore';
+import colors from './utils/colors';
 
 type Question = {
   id: string;
@@ -23,7 +24,7 @@ export const AppNavigator = (): JSX.Element => {
   const [hasCheckedAnswer, setHasCheckAnswer] = React.useState(false);
   const [isCorrectAnswer, setIsCorrectAnswer] = React.useState(false);
   const [questions, setQuestions] = React.useState<Question[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
 
   const appContext = React.useContext(AppContext);
 
@@ -97,9 +98,21 @@ export const AppNavigator = (): JSX.Element => {
       hasCheckedAnswer,
       isCorrectAnswer,
       selectedAnswer,
-      correctAnswer: questions[currentQuestion].answer,
+      correctAnswer: questions.length > 0 ? questions[currentQuestion].answer : '',
     });
   }, [hasCheckedAnswer, isCorrectAnswer, selectedAnswer, currentQuestion]);
+
+  console.log({questions});
+
+  if (loading) {
+    return (
+      <Container>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator color={colors.white} />
+        </View>
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -144,5 +157,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexWrap: 'wrap',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
