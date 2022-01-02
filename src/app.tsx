@@ -6,45 +6,46 @@ import Header from './components/header/Header';
 import Question from './components/header/Question';
 import Option from './components/option/Option';
 import {AppContext} from './context';
-import {getQuestionsSnapshot} from './services/questions.service';
+import {firestore} from './lib/__firebase__';
+import {collection, onSnapshot} from 'firebase/firestore';
+
+type Question = {
+  id: string;
+  text: string;
+  translatedQuestionPreview: string;
+  options: Array<string>;
+  answer: string;
+};
 
 export const AppNavigator = (): JSX.Element => {
   const [currentQuestion, setCurrentQuestion] = React.useState(0);
   const [selectedAnswer, setSelectedAnswer] = React.useState<string>('');
   const [hasCheckedAnswer, setHasCheckAnswer] = React.useState(false);
   const [isCorrectAnswer, setIsCorrectAnswer] = React.useState(false);
+  const [questions, setQuestions] = React.useState<Question[]>([]);
+  const [loading, setLoading] = React.useState(false);
 
   const appContext = React.useContext(AppContext);
 
-  const questions = [
-    {
-      text: 'The house is small',
-      answer: 'haus',
-      translatedQuestionPreview: 'Das _____ ist klein',
-      options: ['folgen', 'haus', 'klein', 'kommen'],
-    },
-    {
-      text: 'The house is small',
-      answer: 'haus',
-      translatedQuestionPreview: 'Das _____ ist klein',
-      options: ['folgen', 'haus', 'klein', 'kommen'],
-    },
-    {
-      text: 'The house is small',
-      answer: 'haus',
-      translatedQuestionPreview: 'Das _____ ist klein',
-      options: ['folgen', 'haus', 'klein', 'kommen'],
-    },
-    {
-      text: 'The house is small',
-      answer: 'haus',
-      translatedQuestionPreview: 'Das _____ ist klein',
-      options: ['folgen', 'haus', 'klein', 'kommen'],
-    },
-  ];
-
   // memoize getQuestionsSnapshot
-  const getQuestions = React.useCallback(() => getQuestionsSnapshot, []);
+  const getQuestions = React.useCallback(() => {
+    setLoading(true);
+    onSnapshot(collection(firestore, 'questions'), docs => {
+      const questionsDocs: Array<Question> = docs.docs.map(doc => {
+        const thisDoc = doc.data();
+        return {
+          id: doc.id,
+          text: thisDoc.text,
+          translatedQuestionPreview: thisDoc.translatedQuestionPreview,
+          options: thisDoc.options,
+          answer: thisDoc.answer,
+        };
+      });
+      setQuestions(questionsDocs);
+
+      setLoading(false);
+    });
+  }, []);
 
   useEffect(() => {
     getQuestions();
